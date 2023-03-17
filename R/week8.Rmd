@@ -5,16 +5,61 @@ output: html_document
 date: "2023-03-14"
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
 **Reproducible Image and Online Resources**
-An image of this project as of *`r Sys.Date()`* can be accessed by clicking this link.
-An interactive web app is available by clicking this link instead.
+An image of this project as of *`r Sys.Date()`* can be accessed by [clicking this link]().
+An interactive web app is available by [clicking this link instead]().
 
 **Script Settings and Resources**
-```{r}
+Set the working directory to where the RMarkdown File is in, load all the necessary packages, and suppress outputs.
+```{r setup, message=FALSE}
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+library(ggplot2)
+library(tidyverse)
+library(DT)
+```
+
+**Data Import and Cleaning**
+Import dataset, convert the reversed coded variable q5, and convert variables to types appropriate for later analysis.
+```{r}
+week8_tbl <-read_csv("../data/week3.csv",col_types=cols(timeStart=col_datetime(format="%Y-%m-%d %H:%M:%S"))) %>%
+  mutate(q5=6-q5) %>%
+  mutate(condition= factor(condition, levels = c("A","B","C"),labels=c("Block A","Block B","Control"))) %>%
+  mutate(gender= factor(gender, levels = c("M","F"),labels=c("Male","Female")))%>%
+  mutate(timeStart = ymd_hms(timeStart))
+```
+
+**Visualization**
+Display a table of data in q1-q6 and a scatterplot between mean scores on Q1-Q6 (x-axis) and mean scores on Q8-Q10 (y-axis).
+```{r, echo=FALSE}
+DT::datatable(week8_tbl[,paste0("q",1:6)])
+
+week8_tbl %>%
+  rowwise() %>%
+  mutate(mean1 = mean(q1:q6),
+         mean2 = mean(q8:q10)) %>%
+  ggplot(aes(mean1,mean2)) +
+  geom_point() +
+  geom_smooth(method="lm", color = "purple") +
+  labs(x="mean scores on Q1-Q6",y="mean scores on Q8-Q10")
+```
+
+**Analysis**
+Display output summarizing the correlation between the two mean scores. Calculate the two means first and then create two new variables to store correlation coefficient and p-value.
+```{r}
+correlation <- week8_tbl %>%
+  rowwise() %>%
+  mutate(mean1 = mean(q1:q6),
+         mean2 = mean(q8:q10)) %>%
+  unnest(cols=c(mean1,mean2)) %>%
+  summarize(coef=cor.test(mean1,mean2)$estimate,
+            p_value = cor.test(mean1,mean2)$p.value)
+
+correlation
+```
+The correlation coefficient is `r correlation$coef`. Assuming that the alpha level is 0.05, as the p-value is greater than 0.05, the correlation is not significant.
+
+**Data Export**
+```{r}
+saveRDS(week8_tbl, "../shiny/week8_tbl")
 ```
 
