@@ -9,7 +9,7 @@ knit: (function(inputFile, encoding) {
 
 **Reproducible Image and Online Resources**
 An image of this project as of *`r Sys.Date()`* can be accessed by [clicking this link]().
-An interactive web app is available by [clicking this link instead]().
+An interactive web app is available by [clicking this link instead](https://chulinchen23.shinyapps.io/shiny/).
 
 **Script Settings and Resources**
 Set the working directory to where the RMarkdown File is in, load all the necessary packages, and suppress outputs.
