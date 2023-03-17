@@ -12,8 +12,12 @@ library(rsconnect)
 
 # Set working directory
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
-deployApp(.)
+#deployApp(.)
 
+# load data
+week8_tbl <- readRDS("week8_tbl")
+
+# 
 ui <- fluidPage(
   titlePanel("Correlation Betwwen Means"),
   sidebarLayout(
@@ -22,25 +26,31 @@ ui <- fluidPage(
       'Select Gender', 
       selected = 'All', 
       choices = c('Male', 'Female', 'All')
+    ),
+    selectInput(
+      'errorband', 
+      'Select whether error band is displayed', 
+      selected = 'All', 
+      label = c("Display Error Band","Suppress Error Band"),
+      choices = c('TRUE', 'FALSE')
     )),
     mainPanel(plotOutput('correlation'))
   )
 )
 
+# display a scatterplot with a purple line based on user-selected gender group
 server <- function(input, output, session) {
   output$correlation <- renderPlot({
-    # CODE BELOW: Update to display a line plot of the input name
     week8_tbl %>%
-      filter(gender==input$sex)
-    rowwise() %>%
+      {if(input$sex!="All") filter(.,gender==input$sex) else .} %>%
+      rowwise() %>%
       mutate(mean1 = mean(q1:q6),
              mean2 = mean(q8:q10)) %>%
       ggplot(aes(mean1,mean2)) +
       geom_point() +
-      geom_smooth(method="lm", color = "purple") +
+      geom_smooth(method="lm", color = "purple", se = input$errorband) +
       labs(x="mean scores on Q1-Q6",y="mean scores on Q8-Q10")
   })
 }
 
-ggplot(bfi, aes_string(x="A1",y="A2"))
 

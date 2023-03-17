@@ -3,6 +3,8 @@ title: PSY 8960 Week 8 Project
 author: Chulin Chen
 output: html_document
 date: "2023-03-14"
+knit: (function(inputFile, encoding) {
+  rmarkdown::render(inputFile, encoding = encoding, output_dir = "../out") })
 ---
 
 **Reproducible Image and Online Resources**
