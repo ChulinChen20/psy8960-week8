@@ -3,12 +3,16 @@ library(shiny)
 library(rsconnect)
 library(ggplot2)
 library(tidyverse)
-
-# Set working directory
-setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+library(conflicted)
 
 # deploy app to shinyapps.io
-deployApp()
+rsconnect::setAccountInfo(name='chulinchen23', 
+                          token='5DF318302FE4ACAA9D2B0681C1193690', 
+                          secret='wMgCig+kaWTc6966WVq/20NDV6ezcBmjxjfHUNs4')
+
+# solving package conflicts
+conflict_prefer("filter", "dplyr")
+conflict_prefer("lag", "dplyr")
 
 # load data
 week8_tbl <- readRDS("week8_tbl")
@@ -59,3 +63,4 @@ server <- function(input, output, session) {
 
 # Run the application 
 shinyApp(ui = ui, server = server)
+

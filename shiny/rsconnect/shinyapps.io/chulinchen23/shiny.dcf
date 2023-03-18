@@ -4,8 +4,10 @@ username:
 account: chulinchen23
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
-appId: 8600951
-bundleId: 6973713
+appId: 8601349
+bundleId: 6973988
 url: https://chulinchen23.shinyapps.io/shiny/
-when: 1679094792.68564
-lastSyncTime: 1679094792.68565
+when: 1679100893.39276
+lastSyncTime: 1679100893.39277
+asMultiple: FALSE
+asStatic: FALSE

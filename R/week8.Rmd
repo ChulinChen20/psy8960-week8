@@ -8,7 +8,7 @@ knit: (function(inputFile, encoding) {
 ---
 
 **Reproducible Image and Online Resources**
-An image of this project as of *`r Sys.Date()`* can be accessed by [clicking this link]().
+An image of this project as of *`r Sys.Date()`* can be accessed by [clicking this link](https://mybinder.org/v2/gh/ChulinChen20/psy8960-week8.git/HEAD).
 An interactive web app is available by [clicking this link instead](https://chulinchen23.shinyapps.io/shiny/).
 
 **Script Settings and Resources**
