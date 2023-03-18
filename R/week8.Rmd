@@ -9,10 +9,10 @@ knit: (function(inputFile, encoding) {
 
 **Reproducible Image and Online Resources**
 An image of this project as of *`r Sys.Date()`* can be accessed by [clicking this link](https://mybinder.org/v2/gh/ChulinChen20/psy8960-week8.git/HEAD).
-An interactive web app is available by [clicking this link instead](https://chulinchen23.shinyapps.io/shiny/).
+An interactive web app is available by [clicking this link instead](https://chulinchen23.shinyapps.io/shiny_week8/).
 
 **Script Settings and Resources**
-Set the working directory to where the RMarkdown File is in, load all the necessary packages, and suppress outputs.
+Set the working directory to where the RMarkdown File is in, load all the necessary packages, and suppress outputs. message=FALSE is used as the only output is the meassage from tidyverse.
 ```{r setup, message=FALSE}
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 library(ggplot2)
@@ -31,7 +31,7 @@ week8_tbl <-read_csv("../data/week3.csv",col_types=cols(timeStart=col_datetime(f
 ```
 
 **Visualization**
-Display a table of data in q1-q6 and a scatterplot between mean scores on Q1-Q6 (x-axis) and mean scores on Q8-Q10 (y-axis).
+Display a table of data in q1-q6 using the package DT as it creates paginated tables. Create a scatterplot between mean scores on Q1-Q6 (x-axis) and mean scores on Q8-Q10 (y-axis), relabel axes for clearer presentation.
 ```{r, echo=FALSE}
 DT::datatable(week8_tbl[,paste0("q",1:6)])
 
@@ -46,7 +46,7 @@ week8_tbl %>%
 ```
 
 **Analysis**
-Display output summarizing the correlation between the two mean scores. Calculate the two means first and then create two new variables to store correlation coefficient and p-value.
+Display output summarizing the correlation between the two mean scores. Calculate the two means first and then create two new variables to store correlation coefficient and p-value from the list created by cor.test(mean1,mean2).
 ```{r}
 correlation <- week8_tbl %>%
   rowwise() %>%
@@ -61,7 +61,8 @@ correlation
 The correlation coefficient is `r correlation$coef`. Assuming that the alpha level is 0.05, as the p-value is greater than 0.05, the correlation is not significant.
 
 **Data Export**
+Export data to RDS format as it is most suitable for shiny app. Save the data to a folder containing the app.
 ```{r}
-saveRDS(week8_tbl, "../shiny/week8_tbl")
+saveRDS(week8_tbl, "../shiny_week8/week8_tbl")
 ```
 

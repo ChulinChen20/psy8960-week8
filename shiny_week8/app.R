@@ -17,10 +17,12 @@ conflict_prefer("lag", "dplyr")
 # load data
 week8_tbl <- readRDS("week8_tbl")
 
-# create three choice input variables and one plot output
+# create three choice input variables and one plot output. 
+# selectInput() are used for all three inputs as the choices are discrete.
+# label choices when variable names are not suitable to be used as displayed options.
 # place input options in the sidebar and the plot in the main panel for clearer display
 ui <- fluidPage(
-  titlePanel("Correlation Betwwen Means"),
+  titlePanel("Correlation Between Variable Means"),
   sidebarLayout(
     sidebarPanel(selectInput(
       'sex', 
@@ -44,8 +46,11 @@ ui <- fluidPage(
   )
 )
 
-# display a scatterplot with a purple OLS regression line 
-# based on user-selected subgroups
+# display a scatterplot with a purple OLS regression line based on user-selected subgroups.
+# the selected subgroups are filtered based on input values selected by users.
+# if else statements are used for sex and date 
+# as some choices involving returning the whole dataset cannot be treated as variable names.
+# convert character to boolean type for errorband options.
 server <- function(input, output, session) {
   output$correlation <- renderPlot({
     week8_tbl %>%
