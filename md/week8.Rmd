@@ -6,63 +6,74 @@ date: "2023-03-14"
 knit: (function(inputFile, encoding) {
   rmarkdown::render(inputFile, encoding = encoding, output_dir = "../out") })
 ---
-
-**Reproducible Image and Online Resources**
+# Reproducible Image and Online Resources
 An image of this project as of *`r Sys.Date()`* can be accessed by [clicking this link](https://mybinder.org/v2/gh/ChulinChen20/psy8960-week8.git/HEAD).
+
 An interactive web app is available by [clicking this link instead](https://chulinchen23.shinyapps.io/shiny_week8/).
 
-**Script Settings and Resources**
+# Script Settings and Resources
 Set the working directory to where the RMarkdown File is in, load all the necessary packages, and suppress outputs. message=FALSE is used as the only output is the meassage from tidyverse.
 ```{r setup, message=FALSE}
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 library(ggplot2)
 library(tidyverse)
-library(DT)
 ```
 
-**Data Import and Cleaning**
+# Data Import and Cleaning
 Import dataset, convert the reversed coded variable q5, and convert variables to types appropriate for later analysis.
 ```{r}
 week8_tbl <-read_csv("../data/week3.csv",col_types=cols(timeStart=col_datetime(format="%Y-%m-%d %H:%M:%S"))) %>%
   mutate(q5=6-q5) %>%
   mutate(condition= factor(condition, levels = c("A","B","C"),labels=c("Block A","Block B","Control"))) %>%
   mutate(gender= factor(gender, levels = c("M","F"),labels=c("Male","Female")))%>%
-  mutate(timeStart = ymd_hms(timeStart))
+  mutate(timeStart = ymd_hms(timeStart)) %>%
+  mutate(mean1 = rowMeans(across(q1:q6)),
+         mean2 = rowMeans(across(q8:q10))) %>%
+  mutate(after_aug2017 = timeEnd > "2017-08-01 00:00:00")
 ```
 
-**Visualization**
+# Visualization
 Display a table of data in q1-q6 using the package DT as it creates paginated tables. Create a scatterplot between mean scores on Q1-Q6 (x-axis) and mean scores on Q8-Q10 (y-axis), relabel axes for clearer presentation.
 ```{r, echo=FALSE}
-DT::datatable(week8_tbl[,paste0("q",1:6)])
+select(week8_tbl, paste0("q",1:6))
 
 week8_tbl %>%
   rowwise() %>%
-  mutate(mean1 = mean(q1:q6),
-         mean2 = mean(q8:q10)) %>%
   ggplot(aes(mean1,mean2)) +
   geom_point() +
   geom_smooth(method="lm", color = "purple") +
   labs(x="mean scores on Q1-Q6",y="mean scores on Q8-Q10")
 ```
 
-**Analysis**
-Display output summarizing the correlation between the two mean scores. Calculate the two means first and then create two new variables to store correlation coefficient and p-value from the list created by cor.test(mean1,mean2).
+# Analysis
+Display output summarizing the correlation between the two mean scores. 
 ```{r}
-correlation <- week8_tbl %>%
-  rowwise() %>%
-  mutate(mean1 = mean(q1:q6),
-         mean2 = mean(q8:q10)) %>%
-  unnest(cols=c(mean1,mean2)) %>%
-  summarize(coef=cor.test(mean1,mean2)$estimate,
-            p_value = cor.test(mean1,mean2)$p.value)
-
-correlation
+cor.test(week8_tbl$mean1, week8_tbl$mean2)
 ```
-The correlation coefficient is `r correlation$coef`. Assuming that the alpha level is 0.05, as the p-value is greater than 0.05, the correlation is not significant.
+The correlation coefficient is `r cor.test(week8_tbl$mean1, week8_tbl$mean2)$estimate`. Assuming that the alpha level is 0.05, as the p-value is greater than 0.05, the correlation is not significant.
 
-**Data Export**
-Export data to RDS format as it is most suitable for shiny app. Save the data to a folder containing the app.
+# Data Export
+Export data to a skinny RDS format data as it is most suitable for shiny app. Save the data to a folder containing the app.
 ```{r}
-saveRDS(week8_tbl, "../shiny_week8/week8_tbl")
+week8_tbl %>%
+  select(mean1, mean2, 
+         gender, after_aug2017) %>%
+  saveRDS("../shiny_week8/shiny_skinny.RDS")
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

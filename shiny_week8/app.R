@@ -5,17 +5,12 @@ library(ggplot2)
 library(tidyverse)
 library(conflicted)
 
-# deploy app to shinyapps.io
-rsconnect::setAccountInfo(name='chulinchen23', 
-                          token='5DF318302FE4ACAA9D2B0681C1193690', 
-                          secret='wMgCig+kaWTc6966WVq/20NDV6ezcBmjxjfHUNs4')
-
 # solving package conflicts
 conflict_prefer("filter", "dplyr")
 conflict_prefer("lag", "dplyr")
 
 # load data
-week8_tbl <- readRDS("week8_tbl")
+week8_tbl <- readRDS("shiny_skinny.RDS")
 
 # create three choice input variables and one plot output. 
 # selectInput() are used for all three inputs as the choices are discrete.
@@ -47,18 +42,17 @@ ui <- fluidPage(
 )
 
 # display a scatterplot with a purple OLS regression line based on user-selected subgroups.
+# define working tbl to iteratively modify for later display in ggplot
 # the selected subgroups are filtered based on input values selected by users.
 # if else statements are used for sex and date 
 # as some choices involving returning the whole dataset cannot be treated as variable names.
 # convert character to boolean type for errorband options.
 server <- function(input, output, session) {
   output$correlation <- renderPlot({
-    week8_tbl %>%
+    week8_disp_tbl <- week8_tbl
+    week8_disp_tbl %>%
       {if(input$sex!="All") filter(.,gender==input$sex) else .} %>%
-      {if(input$date!="Include") filter(.,timeEnd < "2017-08-01 00:00:00") else .} %>%
-      rowwise() %>%
-      mutate(mean1 = mean(q1:q6),
-             mean2 = mean(q8:q10)) %>%
+      {if(input$date!="Include") filter(.,after_aug2017 == T) else .} %>%
       ggplot(aes(mean1,mean2)) +
       geom_point() +
       geom_smooth(method="lm", color = "purple", se = as.logical(input$errorband)) +
@@ -68,4 +62,3 @@ server <- function(input, output, session) {
 
 # Run the application 
 shinyApp(ui = ui, server = server)
-
